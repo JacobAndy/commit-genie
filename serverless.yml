@@ -11,5 +11,8 @@ provider:
   profile: personalAccount
 
 functions:
-  function1:
+  commitgenie:
     handler: index.handler
+    events:
+      - schedule: cron(0 12 ? * 1-7 *)
+

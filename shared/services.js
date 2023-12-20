@@ -28,7 +28,6 @@ const getMostRecentCommitOID =async (githubUserName,githubRepoName,githubAuthTok
             name:githubRepoName
         }
         }, githubAuthToken)
-        console.log('ummm? ', results)
         return results.data.repository.defaultBranchRef.target.oid
     }catch(err){
         console.log('ERROR Fetching Recent OID ', err)
