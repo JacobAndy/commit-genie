@@ -1,0 +1,11 @@
+service: commit-genie
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  profile: personalAccount
+
+functions:
+  function1:
+    handler: index.handler
