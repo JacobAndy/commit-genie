@@ -1,5 +1,9 @@
+useDotenv: true
 service: commit-genie
 frameworkVersion: '3'
+	
+plugins:
+  - serverless-dotenv-plugin
 
 provider:
   name: aws

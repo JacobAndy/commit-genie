@@ -1,48 +1,35 @@
-const MAIN_GRAPHQL_ENDPOINT = 'https://api.github.com/graphql';
-const GITHUB_AUTH_TOKEN = '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';
+require('dotenv').config()
+const { setNewCommitOnBranchWithRecentCommitOid, getMostRecentCommitOID, getAndUpdateFileContent } = require('./shared/services');
+const { generateUpdatedFileVariables } = require('./shared/transformations');
 
-const sampleFetcher =async () => {
-    try{
-        const results = await fetch(MAIN_GRAPHQL_ENDPOINT, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${GITHUB_AUTH_TOKEN}`
-            },
-            body: JSON.stringify({
-              query: `
-                  query {
-                      viewer {
-                          login
-                      }
-                  }
-                `,
-              // variables: {
-              //   now: new Date().toISOString(),
-              // },
-            }),
-          })
-          console.log('success data is here... ', results)
-          return results;
-    }catch(err){
-        console.log('ERROR IS HERE ', err)
-    }
-   
-}
+const GITHUB_AUTH_TOKEN = process.env.GITHUB_ACCESS_TOKEN;
+const GITHUB_USER_NAME = process.env.GITHUB_USER_NAME;
+const GITHUB_REPO_NAME = process.env.GITHUB_REPO_NAME;
 
 
 module.exports.handler = async (event) => {
-    const data = await sampleFetcher();
-    console.log('data is coming through over here... ', data)
-  return {
-    statusCode: 200,
-    body: JSON.stringify(
-      {
-        message: 'Go Serverless v3.0! Your function executed successfully!',
-        input: event,
-      },
-      null,
-      2
-    ),
-  };
+    const recentCommitOid = await getMostRecentCommitOID(GITHUB_USER_NAME, GITHUB_REPO_NAME,GITHUB_AUTH_TOKEN);
+    const updatedFileContent = await getAndUpdateFileContent(GITHUB_USER_NAME, GITHUB_REPO_NAME, GITHUB_AUTH_TOKEN);
+    const response = await setNewCommitOnBranchWithRecentCommitOid(
+        generateUpdatedFileVariables(
+            GITHUB_USER_NAME, 
+            GITHUB_REPO_NAME, 
+            recentCommitOid, 
+            updatedFileContent
+            ),
+            GITHUB_AUTH_TOKEN
+        )
+
+    return {
+        statusCode: 200,
+        body: JSON.stringify(
+        {
+            message: 'Genie is back in the bottle...',
+            input: event,
+            response: response
+        },
+        null,
+        2
+        ),
+    };
 };
